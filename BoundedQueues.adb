@@ -84,7 +84,7 @@ package body BoundedQueues is
 
    function GetSize (Q : Queue) return Natural is (Q.Size);
    function IsEmpty (Q : Queue) return Boolean is (Q.Size = 0);
-   function IsFull (Q : Queue) return Boolean is (Q.Size = Q.content'Length);
+   function IsFull (Q : Queue) return Boolean is (GetLast(Q) = Q.content'Length-1);
    procedure Pop (Q : in out Queue; e : out Element_Type) is
    --  tmp: Optional;
    begin
@@ -122,10 +122,11 @@ package body BoundedQueues is
    end Push;
 
    function GetElements (Q : Queue) return Element_Array is
-      tmp     : Element_Array (Q.content'First .. (Q.Size - 1));
+      tmp     : Element_Array (Q.content'First .. (GetSize(Q)-1));
       current : Natural range tmp'Range := Q.content'First;
    begin
       if IsEmpty (Q) then
+         tmp := (others => <>);
          return tmp;
       else
 
@@ -142,7 +143,7 @@ package body BoundedQueues is
 
          end loop;
       end if;
-      pragma Assert(Q.Size = tmp'Length);
+      pragma Assert(GetSize(Q) = tmp'Length);
       return tmp;
    end GetElements;
 

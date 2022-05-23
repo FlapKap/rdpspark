@@ -129,7 +129,7 @@ CLOSEWAIT      : Natural                    := 10_000;
       if active_request then
          conn.LOCAL_PORT  := local_port;
          conn.REMOTE_PORT := remote_port;
-
+         pragma Assert(not IsFull(Q => channel));
          Push
            (channel,
             (Flags => (SYN => True, others => <>), Source_Port => local_port,
@@ -271,8 +271,9 @@ CLOSEWAIT      : Natural                    := 10_000;
          when SYN_SENT =>
             null; --- not finished
          when others =>
-            Pop(Q => channel,
-                e => s); -- not finised
+            null;
+            --  Pop(Q => channel,
+            --      e => s); -- not finished
       end case;
    end Rcv_From_Connection;
 

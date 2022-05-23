@@ -77,7 +77,9 @@ package BoundedQueues is
       Pre    => Consistent (Q)
       and then (GetFirst (Q) <= Max and GetContent (Q)'Length = Max),
       Post => Consistent (Q) and GetSize'Result >= 0 and
-      GetSize'Result <= Max and GetSize'Result = Q.Size;
+      GetSize'Result <= Max and GetSize'Result = Q.Size and
+      (for all I in GetFirst (Q) .. GetFirst (Q) + Q.Size - 1 =>
+         GetContent (Q) (I).Has_Element);
    function GetLast (Q : Queue) return Natural with
       Global => null,
       Pre    => Consistent (Q) and then GetSize (Q) + GetFirst (Q) <= Max,
@@ -105,12 +107,24 @@ package BoundedQueues is
       Global => null,
       Pre    => Consistent (Q),
       Post   =>
-      (if IsEmpty'Result then GetSize (Q) = 0
-       else GetSize (Q) > 0 and
-         (for some J in GetContent (Q)'Range => GetContent (Q) (J).Has_Element));
+      (if IsEmpty'Result then
+         (GetSize (Q) = 0 and GetLast (Q) = GetFirst (Q) and
+          (for all I in GetContent (Q)'Range =>
+             not GetContent (Q) (I).Has_Element))
+       else
+         (GetSize (Q) > 0 and
+          (GetLast (Q) > GetFirst (Q) or (GetSize (Q) = 1)) and
+          (for all J in GetFirst (Q) .. GetLast (Q) =>
+             GetContent (Q) (J).Has_Element)));
    function IsFull (Q : in Queue) return Boolean with
       Pre  => Consistent (Q),
-      Post => (if IsFull'Result then GetSize (Q) = Max else GetSize (Q) < Max);
+      Post =>
+      (if IsFull'Result then
+         (GetLast (Q) = Max - 1) and
+         (IsEmpty (Q) or
+          (for all I in GetFirst (Q) .. GetContent (Q)'Last =>
+             GetContent (Q) (I).Has_Element))
+       else GetLast (Q) < Max - 1);
    procedure Pop (Q : in out Queue; e : out Element_Type) with
       Global  => null,
       Depends => (Q => Q, e => Q),
@@ -124,21 +138,23 @@ package BoundedQueues is
       Global  => null,
       Depends => (Q => (Q, e)),
       Pre     => Consistent (Q)
-      and then ((not IsFull (Q)) and (GetSize (Q) + GetFirst (Q) < Max)),
+      and then
+      ((not IsFull (Q))),-- and then (GetSize (Q) + GetFirst (Q) < Max)),
       Post => GetContent (Q) (GetLast (Q)).Element = e and then Consistent (Q)
       and then (GetSize (Q) = GetSize (Q'Old) + 1 and (not IsEmpty (Q)));
 
    type Element_Array is array (Natural range <>) of Element_Type;
    function GetElements (Q : in Queue) return Element_Array with
       Global => null,
-      Pre    => Consistent (Q) and (not IsEmpty (Q)),
+      Pre    => Consistent (Q) and then (not IsEmpty (Q)),
 
-      Post => (GetElements'Result'Length = Q.Size)
-      and then
-      (for all I in GetContent (Q)'Range =>
-         (if GetContent (Q) (I).Has_Element then
+     Post =>
+          (((GetElements'Result'First <= GetElements'Result'Last)
+      and
+      (for all I in GetFirst(Q)..GetLast(Q) =>
             (for some J in GetElements'Result'Range =>
-               (GetElements'Result (J) = GetContent (Q) (I).Element))));
+               (GetElements'Result (J) = GetContent (Q) (I).Element)))) or GetElements'Result'Length = 0) ;
+
       --  (for all I in GetElements'Result'Range =>
       --     (for some J in Q.content'Range =>
       --        (if (GetContent (Q) (J).Has_Element) then

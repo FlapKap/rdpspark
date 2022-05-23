@@ -244,12 +244,19 @@ CLOSEWAIT      : Natural                    := 10_000;
       data :        Data_Array_Type) with
       Pre =>
       ((conn.STATE = OPEN) and (conn.SND_NXT < conn.SND_UNA + conn.SND_MAX))
-      and then Consistent (channel) and then not IsFull (channel),
+      and then Consistent (channel) and then (not IsFull (channel)),
       Post => conn.SND_NXT'Old + 1 =
       conn.SND_NXT --and channel.Sithen Consistent (channel)
       and then not IsEmpty (channel);
 
    procedure Rcv_From_Connection
-     (conn : in out Connection; channel : in out Queue);
+     (conn : in out Connection; channel : in out Queue) with
+      Pre => Consistent (channel)
+      and then
+      ((not IsEmpty (channel))
+       and then
+       (IsRST (GetContent (channel) (GetFirst (channel)).Element) or
+        IsACK (GetContent (channel) (GetFirst (channel)).Element) or
+        IsNUL (GetContent (channel) (GetFirst (channel)).Element)));
 
 end RDP;
