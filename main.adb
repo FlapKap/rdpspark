@@ -17,16 +17,22 @@ procedure main is
    REMOTE_PORT : Port_Type                  := 1_024;
    snd_max     : Sequence_Number_Type       := 1_024; -- arbitrarily chosen
    rbuf_max    : Segment_Size_In_Bytes_Type := 64; -- arbitrarily chosen;
-   Alice: Connection := Create_Connection;
-   Bob :  Connection := Create_Connection;
-   channel : Channel_Type.Queue := Channel_Type.Make;
+   Alice: Connection ;
+   Bob :  Connection ;
+   channel : Channel_Type.Queue ;
 begin
-
+   -- make
+   Alice:= Create_Connection;
+   Bob := Create_Connection;
+   channel := Channel_Type.Make;
+   
    --open alice
+   pragma Assert (channel.First = 0);
    Open_Connection
      (conn    => Alice, channel => channel, active_request => False,
       snd_max => snd_max, rmax_buf => rbuf_max);
    pragma Assert (Channel_Type.Consistent(channel));
+   pragma Assert (channel.First = 0);
    --open bob
    Open_Connection
      (conn    => Bob, channel => channel, active_request => True,

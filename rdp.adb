@@ -108,6 +108,7 @@ CLOSEWAIT      : Natural                    := 10_000;
    is
       remote_port : Port_Type := 255; -- just a random port
       local_port  : Port_Type := 255; -- just a random port
+      tmp: Natural := channel.Size;
    begin
 
       if not (conn.STATE = CLOSED) then
@@ -139,7 +140,7 @@ CLOSEWAIT      : Natural                    := 10_000;
              Max_Segment_Size         => conn.RBUF_MAX, others => <>));
 
          conn.STATE := SYN_SENT;
-
+         pragma Assert (channel.Size > tmp);
       else --passive
          conn.LOCAL_PORT := local_port;
          conn.STATE      := LISTEN;
