@@ -32,7 +32,7 @@ begin
      (conn    => Alice, channel => channel, active_request => False,
       snd_max => snd_max, rmax_buf => rbuf_max);
    pragma Assert (Channel_Type.Consistent(channel));
-   pragma Assert (channel.First = 0);
+
    --open bob
    Open_Connection
      (conn    => Bob, channel => channel, active_request => True,
