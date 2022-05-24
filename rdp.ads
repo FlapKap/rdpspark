@@ -218,7 +218,7 @@ CLOSEWAIT      : Natural                    := 10_000;
       rmax_buf       :        Segment_Size_In_Bytes_Type) with
       Pre => conn.STATE = CLOSED
       and then
-      (Consistent (channel)
+      ((Consistent (channel) and then isEmpty(channel))
        and then (if active_request then not IsFull (channel))),
       Post =>
       (conn.SND_ISS = conn.SND_UNA and conn.SND_NXT = conn.SND_ISS + 1 and

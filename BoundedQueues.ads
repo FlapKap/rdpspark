@@ -78,7 +78,7 @@ package BoundedQueues is
       and then (GetFirst (Q) <= Max and GetContent (Q)'Length = Max),
       Post => Consistent (Q) and GetSize'Result >= 0 and
       GetSize'Result <= Max and GetSize'Result = Q.Size and
-      (for all I in GetFirst (Q) .. GetFirst (Q) + Q.Size - 1 =>
+      (for all I in GetFirst (Q) .. (GetFirst (Q) + Q.Size - 1) =>
          GetContent (Q) (I).Has_Element);
    function GetLast (Q : Queue) return Natural with
       Global => null,
@@ -140,7 +140,7 @@ package BoundedQueues is
       Pre     => Consistent (Q)
       and then
       ((not IsFull (Q))),-- and then (GetSize (Q) + GetFirst (Q) < Max)),
-      Post => GetContent (Q) (GetLast (Q)).Element = e and then Consistent (Q)
+      Post => Consistent (Q) and GetContent (Q) (GetLast (Q)).Element = e
       and then (GetSize (Q) = GetSize (Q'Old) + 1 and (not IsEmpty (Q)));
 
    type Element_Array is array (Natural range <>) of Element_Type;
