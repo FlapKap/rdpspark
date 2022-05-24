@@ -140,7 +140,7 @@ package BoundedQueues is
       Pre     => Consistent (Q)
       and then
       ((not IsFull (Q))),-- and then (GetSize (Q) + GetFirst (Q) < Max)),
-      Post => Consistent (Q) and GetContent (Q) (GetLast (Q)).Element = e
+      Post => (Consistent (Q) and GetContent (Q) (GetLast (Q)).Element = e)
       and then (GetSize (Q) = GetSize (Q'Old) + 1 and (not IsEmpty (Q)));
 
    type Element_Array is array (Natural range <>) of Element_Type;
