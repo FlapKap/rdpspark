@@ -190,7 +190,6 @@ CLOSEWAIT      : Natural                    := 10_000;
       if not (conn.SND_NXT < conn.SND_UNA + conn.SND_MAX) then
          raise InsufficientResources;
       end if;
-
       Push
         (Q => channel,
          e =>

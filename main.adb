@@ -10,7 +10,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 procedure main is
 
-   package R is new RDP (Max => 16);
+   package R is new RDP (Max => 1024);
    use R;
 
    LOCAL_PORT  : Port_Type                  := 1_024;

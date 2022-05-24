@@ -67,6 +67,7 @@ package BoundedQueues is
    --         not Q.content(I).Has_Element))));
 
    function GetContent (Q : in Queue) return QueueContent with
+      Ghost,
       Global => null,
       Post   => GetContent'Result = Q.content;
    function GetFirst (Q : in Queue) return Natural with
@@ -99,9 +100,9 @@ package BoundedQueues is
       Global => null,
       Post   => Consistent (Make'Result) and IsEmpty (Make'Result) and
       Make'Result.First = Make'Result.content'First;
-      --(for all I in GetContent (Make'Result)'Range =>
-      --  not GetContent (Make'Result) (I).Has_Element);
-      --pragma Assume(Consistent(Make'Result));
+   --(for all I in GetContent (Make'Result)'Range =>
+   --  not GetContent (Make'Result) (I).Has_Element);
+   --pragma Assume(Consistent(Make'Result));
 
    function IsEmpty (Q : in Queue) return Boolean with
       Global => null,
@@ -145,15 +146,15 @@ package BoundedQueues is
 
    type Element_Array is array (Natural range <>) of Element_Type;
    function GetElements (Q : in Queue) return Element_Array with
+      Ghost,
       Global => null,
       Pre    => Consistent (Q) and then (not IsEmpty (Q)),
-
-     Post =>
-          (((GetElements'Result'First <= GetElements'Result'Last)
-      and
-      (for all I in GetFirst(Q)..GetLast(Q) =>
-            (for some J in GetElements'Result'Range =>
-               (GetElements'Result (J) = GetContent (Q) (I).Element)))) or GetElements'Result'Length = 0) ;
+      Post =>
+      (((GetElements'Result'First <= GetElements'Result'Last) and
+        (for all I in GetFirst (Q) .. GetLast (Q) =>
+           (for some J in GetElements'Result'Range =>
+              (GetElements'Result (J) = GetContent (Q) (I).Element)))) or
+       GetElements'Result'Length = 0);
 
       --  (for all I in GetElements'Result'Range =>
       --     (for some J in Q.content'Range =>
